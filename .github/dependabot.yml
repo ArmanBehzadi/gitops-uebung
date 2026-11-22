@@ -1,0 +1,11 @@
+# Auftrag: GITOPS-UEBUNG-2 – gepinnte Action-SHAs und den nginx-Digest aktuell halten
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly

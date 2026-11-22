@@ -6,12 +6,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
 concurrency:
   group: pages
   cancel-in-progress: false
-# Zwei Jobs: Im Ein-Job-Lauf fand deploy-pages das eben hochgeladene Artefakt 0,35 s später nicht (Lauf 44973707298).
+# Zwei Jobs als Umgehung des Fehlers «No artifacts named github-pages»; Ursache: siehe ERGEBNIS GITOPS-UEBUNG-2.
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +22,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
