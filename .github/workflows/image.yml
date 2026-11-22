@@ -1,0 +1,22 @@
+# Auftrag: GITOPS-UEBUNG-1 – Workflow B: dieselbe Seite als Image nach ghcr.io
+name: image
+on:
+  push:
+    branches: [main]
+    paths: [index.html, Dockerfile, .github/workflows/image.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/armanbehzadi/gitops-uebung
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: mkdir _site && sed "s/__FASSUNG__/${GITHUB_SHA}/g" index.html > _site/index.html
+      - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - run: docker build -t "$IMAGE:latest" -t "$IMAGE:${GITHUB_SHA}" .
+      - run: docker push --all-tags "$IMAGE"
+      - run: docker image inspect "$IMAGE:latest" --format '{{index .RepoDigests 0}}'
